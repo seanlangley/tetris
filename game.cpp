@@ -2,27 +2,31 @@
 #include "game.h"
 
 Game::Game(int max_y, int max_x)
-    :CURSES_MAX_Y(max_y), CURSES_MAX_X(max_x), m_well(max_y / 4, max_x / 4) {
+    :MAX_Y(max_y), MAX_X(max_x), m_well(max_y / 4, max_x / 4),
+     m_messages(MAX_Y - 10, MAX_X - 30) {
     srand(time(NULL));
     noecho();
     cbreak();
-    timeout(100);
-    DEBUG.first = CURSES_MAX_Y - 10;
-    DEBUG.second = CURSES_MAX_X - 30;
-    m_well.DrawWell(CURSES_MAX_X/4, CURSES_MAX_Y/4);
-    PrintDebugMessage();
+    m_well.DrawWell(0, 10);
+    m_messages.MakeDebugMsg("Welcome to Tetris!");
+    m_messages.MakeDebugMsg("Press q to quit.");
+
+    m_messages.PrintDebugMessages();
     refresh();
 }
 
 void Game::Update() {
-    clear();
     m_well.UpdatePieceCoords();
-    m_well.DrawWell(CURSES_MAX_X/4, CURSES_MAX_Y/4);
-    PrintDebugMessage();
+    m_well.PrintPieceData();
+    m_well.DrawWell(0, 10);
+    GetInput();
+    m_messages.PrintDebugMessages();
     refresh();
 }
 
-void Game::PrintDebugMessage() {
-    mvprintw(DEBUG.first, DEBUG.second, "Welcome to tetris!");
-    mvprintw(DEBUG.first+1, DEBUG.second, "Press q to quit.");
+
+void Game::GetInput(){
+    if( getch() == ' ' ){
+        m_messages.MakeDebugMsg("You hit the space bar");
+    }
 }

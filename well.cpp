@@ -1,8 +1,12 @@
 #include "well.h"
+#include "game.h"
 #include <ncurses.h>
 #include <cstring>
+#include <sstream>
+
 Well::Well(int base_y, int base_x) 
-    :m_width(WELL_WIDTH), m_height(WELL_HEIGHT), m_base_x(base_x), m_base_y(base_y){
+    :m_width(WELL_WIDTH), m_height(WELL_HEIGHT), m_base_x(base_x), m_base_y(base_y),
+    m_messages(base_y-15, base_x+WELL_WIDTH+10){
     /* Put WELL_HEIGHT strings onto the m_structure vector */
     for( int i = 0; i < WELL_HEIGHT; i++ ) {
         m_structure.push_back("");
@@ -33,6 +37,7 @@ void Well::DrawWell(int base_x, int base_y) {
     std::vector<Piece>::iterator CurrPiece = m_pieces.begin();
 
     ResetWell();
+    // Set the well's structure equal to all the piece values
     for(; CurrPiece != m_pieces.end(); CurrPiece++ ) {
         std::vector<std::string> *CurrPieceStructure = CurrPiece->structure();
         /* Pieces guaranteed to be a 4x4 array */
@@ -57,9 +62,7 @@ piece_types Well::AddPiece() {
 }
 
 void Well::UpdatePieceCoords() {
-    std::vector<Piece>::iterator PieceIterator = m_pieces.begin();
-    for(; PieceIterator != m_pieces.end(); PieceIterator++ ) {
-        if( PieceIterator->y() < WELL_HEIGHT - 5 )
-            PieceIterator->MoveDown();
+    if( m_pieces.back().y() < WELL_HEIGHT - 5 ) {
+        m_pieces.back().MoveDown();
     }
 }
